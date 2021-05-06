@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.*;
 import java.io.File;
 import javax.swing.BoxLayout;
+import java.util.ArrayList;
 
 public class Main{
     
@@ -21,22 +22,27 @@ public class Main{
         AppVariables appVariables = new AppVariables();
         appVariables.frame = new JFrame();
         appVariables.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        appVariables.frame.setSize(500,500);
-        appVariables.frame.setLayout(new BorderLayout(10,10));
-
+        appVariables.frame.setSize(2000,2000);
+        //appVariables.frame.setLayout(new BorderLayout(10,10));
+        //appVariables.frame.setPreferredSize(2000,2000);
 		appVariables.frame.setVisible(true);
         //JPanel panels[];
+        JPanel overall = new JPanel();
+        overall.setPreferredSize(new Dimension(1000,1000));
+        overall.setLayout(new BorderLayout(10,10));
 		JPanel panel1 = new JPanel();
-		JPanel panel2 = new JPanel();
+		JPanel panel2 = new JPanel(); //file view
 		JPanel panel3 = new JPanel();
 		JPanel panel4 = new JPanel();
 		JPanel panel5 = new JPanel();
-
-		panel1.setPreferredSize(new Dimension(100,50));
-		panel2.setPreferredSize(new Dimension(200,200));
-		panel3.setPreferredSize(new Dimension(150,100));
-		panel4.setPreferredSize(new Dimension(100,100));
-		panel5.setPreferredSize(new Dimension(100,100));
+        JScrollPane scrollPane2 = new JScrollPane(panel2);
+        JScrollPane scrollPane4 = new JScrollPane(panel4);
+        
+		//panel1.setPreferredSize(new Dimension(100,50));
+		//panel2.setPreferredSize(new Dimension(500,500));
+		//panel3.setPreferredSize(new Dimension(500,500));
+		//panel4.setPreferredSize(new Dimension(500,500));
+		//panel5.setPreferredSize(new Dimension(100,100));
 
         panel1.setBorder(BorderFactory.createLineBorder(Color.black));
         panel2.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -46,9 +52,9 @@ public class Main{
 
         
         Header header = new Header(appVariables);
-        FileView fileView = new FileView(appVariables);
-        DropZone dropZone = new DropZone(appVariables);
         BatchView batchView = new BatchView(appVariables);
+        FileView fileView = new FileView(appVariables, batchView);
+        DropZone dropZone = new DropZone(appVariables);
         MediaPlayer mediaPlayer = new MediaPlayer(appVariables);
 
         panel1.add(header);
@@ -57,19 +63,33 @@ public class Main{
         panel4.add(batchView);
         panel5.add(mediaPlayer);
 
-        appVariables.frame.add(panel1,BorderLayout.NORTH);
-		appVariables.frame.add(panel2,BorderLayout.WEST);
-		appVariables.frame.add(panel3,BorderLayout.EAST);
-		appVariables.frame.add(panel4,BorderLayout.SOUTH);
-		appVariables.frame.add(panel5,BorderLayout.CENTER);
+        overall.add(panel1,BorderLayout.NORTH);
+		overall.add(scrollPane2,BorderLayout.WEST);
+		overall.add(scrollPane4,BorderLayout.EAST);
+		overall.add(panel5,BorderLayout.SOUTH);
+		overall.add(panel3,BorderLayout.CENTER);
+        appVariables.frame.add(overall);
         appVariables.frame.pack();
         appVariables.frame.setVisible(true);
+        /*appVariables.frame.add(panel1,BorderLayout.NORTH);
+		appVariables.frame.add(scrollPane2,BorderLayout.WEST);
+		appVariables.frame.add(panel4,BorderLayout.EAST);
+		appVariables.frame.add(panel5,BorderLayout.SOUTH);
+		appVariables.frame.add(panel3,BorderLayout.CENTER);
+        appVariables.frame.pack();
+        appVariables.frame.setVisible(true);*/
     }
+}
+class BatchItem{
+    File file;
+    boolean isFile;
+
 }
 class AppVariables{
     JFrame frame;
     File fileChoose;
     JFileChooser fc;
+    ArrayList<BatchItem> items = new ArrayList<BatchItem>();
 }
 class Header extends JPanel{
     //File fileChoose;
@@ -127,27 +147,40 @@ class Header extends JPanel{
 
 // class otherContent extends ContentView{}  now has static variables
 class FileView extends JPanel{
-    public FileView(AppVariables appVariables){
+    public FileView(AppVariables appVariables, BatchView batchView){
         JButton load = new JButton("Load Files");
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         add(load);
         add(panel);
         //appVariables.fc.addActionListener(new ActionListener() {
         load.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("This occured");
+                panel.removeAll();
+                panel.revalidate();
+                panel.repaint();
+                //System.out.println("This occured");
                 //if(appVariables.fileChoose != null && appVariables.fileChoose.length() > 0){
                     //for(String iter : appVariables.fileChoose.list()){
                     //    System.out.println(iter);
                     //}
                     for(File file : appVariables.fileChoose.listFiles()){
                         if(file.getName().endsWith(".mp3")){
-                            System.out.println("This got chosen");
+                            //System.out.println("This got chosen");
                             JButton song = new JButton(file.getName());
                             song.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e){
-                                    System.out.println(file.getName());
+                                    BatchItem temp = new BatchItem();
+                                    temp.file = file;
+                                    temp.isFile = true;
+                                    appVariables.items.add(temp);
+                                    //System.out.println(file.getName());
+                                    batchView.refresh(appVariables);
+                                    SwingUtilities.updateComponentTreeUI(appVariables.frame);
+                                    //batchView.revalidate();
+                                    //batchView.repaint();
+                                    //appVariables.frame.getComponentAt(BorderLayout.EAST).revalidate();
                                 }
                             });
                             panel.add(song);
@@ -155,23 +188,13 @@ class FileView extends JPanel{
                     }
                 
                 //}
+                
                 SwingUtilities.updateComponentTreeUI(appVariables.frame);
             }
         });
-        /*file.addActionListener(new ActionListener() {
-            
-            
-            public void actionPerformed(ActionEvent e) {
-                String[] filesS = appVariables.fileChoose.list();
-                //File[] files = fileChoose.
-                System.out.println("This is FileView");
-                for(String iter : filesS){
-                    System.out.println(iter);
-                }
-            }
-        });
-        add(file);*/
+
     }
+
 }
 class DropZone extends JPanel{
     public DropZone(AppVariables appVariables){
@@ -180,7 +203,35 @@ class DropZone extends JPanel{
 }
 class BatchView extends JPanel{
     public BatchView(AppVariables appVariables){
+        
+        setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
+        System.out.println("this should be more unique");
+        for(BatchItem iter : appVariables.items){
+            System.out.println(iter.file.getName());
+            JButton item = new JButton(iter.file.getName());
+            add(item);
+        }
+    }
+    public void refresh(AppVariables appVariables){
+        removeAll();
+        setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        System.out.println("this should be more unique");
+        int i = 0;
+        for(BatchItem iter : appVariables.items){
+            System.out.println(iter.file.getName());
+            JButton item = new JButton(iter.file.getName());
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e){
+                    //remove(item);
+                    appVariables.items.remove(iter);
+                    refresh(appVariables);
+                    SwingUtilities.updateComponentTreeUI(appVariables.frame);
+                }
+            });
+            add(item);
+            i++;
+        }
     }
 }
 class MediaPlayer extends JPanel{
