@@ -14,7 +14,10 @@ import javax.swing.filechooser.*;
 import java.io.File;
 import javax.swing.BoxLayout;
 import java.util.ArrayList;
-
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import com.github.kiulian.downloader.*;
 public class Main{
     
     public static void main(String[] args){
@@ -51,11 +54,12 @@ public class Main{
         panel5.setBorder(BorderFactory.createLineBorder(Color.black));
 
         
-        Header header = new Header(appVariables);
+        
         BatchView batchView = new BatchView(appVariables);
         FileView fileView = new FileView(appVariables, batchView);
         DropZone dropZone = new DropZone(appVariables);
         MediaPlayer mediaPlayer = new MediaPlayer(appVariables);
+        Header header = new Header(appVariables, fileView);
 
         panel1.add(header);
         panel2.add(fileView);
@@ -80,6 +84,16 @@ public class Main{
         appVariables.frame.setVisible(true);*/
     }
 }
+
+class Youtils{
+
+    public Youtils(AppVariables appVariables){
+
+    }
+
+
+}
+
 class BatchItem{
     File file;
     boolean isFile;
@@ -95,7 +109,7 @@ class Header extends JPanel{
     //File fileChoose;
     
     //JFileChooser fc; 
-    public Header(AppVariables appVariables){
+    public Header(AppVariables appVariables, FileView fileView){
         JButton settings = new JButton("SETTINGS");
         JButton file = new JButton("FILE");
         JButton play = new JButton("PLAY");
@@ -122,7 +136,7 @@ class Header extends JPanel{
                     //for(String iter : filesS){
                     //    System.out.println(iter);
                     //}
-
+                    fileView.refresh();
                     //This is where a real application would open the file.
                     //log.append("Opening: " + file.getName() + "." + newline);
                 } else {
@@ -147,17 +161,23 @@ class Header extends JPanel{
 
 // class otherContent extends ContentView{}  now has static variables
 class FileView extends JPanel{
+    private AppVariables appVariables;
+    private BatchView batchView;
+    private JPanel panel;
     public FileView(AppVariables appVariables, BatchView batchView){
-        JButton load = new JButton("Load Files");
-        JPanel panel = new JPanel();
+        this.appVariables = appVariables;
+        this.batchView = batchView;
+       
+        panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-        add(load);
+        
         add(panel);
         //appVariables.fc.addActionListener(new ActionListener() {
-        load.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                panel.removeAll();
+        //load.addActionListener(new ActionListener() {
+        //    public void actionPerformed(ActionEvent e) {
+         //       refresh();
+                /*panel.removeAll();
                 panel.revalidate();
                 panel.repaint();
                 //System.out.println("This occured");
@@ -190,16 +210,78 @@ class FileView extends JPanel{
                 //}
                 
                 SwingUtilities.updateComponentTreeUI(appVariables.frame);
-            }
-        });
+                 *///}
+        //});
 
+    }
+    public void refresh(){
+        panel.removeAll();
+        panel.revalidate();
+        panel.repaint();
+        //System.out.println("This occured");
+        //if(appVariables.fileChoose != null && appVariables.fileChoose.length() > 0){
+            //for(String iter : appVariables.fileChoose.list()){
+            //    System.out.println(iter);
+            //}
+            for(File file : appVariables.fileChoose.listFiles()){
+                if(file.getName().endsWith(".mp3")){
+                    //System.out.println("This got chosen");
+                    JButton song = new JButton(file.getName());
+                    song.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e){
+                            BatchItem temp = new BatchItem();
+                            temp.file = file;
+                            temp.isFile = true;
+                            appVariables.items.add(temp);
+                            //System.out.println(file.getName());
+                            batchView.refresh(appVariables);
+                            SwingUtilities.updateComponentTreeUI(appVariables.frame);
+                            //batchView.revalidate();
+                            //batchView.repaint();
+                            //appVariables.frame.getComponentAt(BorderLayout.EAST).revalidate();
+                        }
+                    });
+                    panel.add(song);
+                }
+            }
+        
+        //}
+        
+        SwingUtilities.updateComponentTreeUI(appVariables.frame);
     }
 
 }
 class DropZone extends JPanel{
-    public DropZone(AppVariables appVariables){
 
+    private JTextField textField;
+    private JButton addButton;
+    //private DocumentListener textListener;
+    AppVariables appVariables;
+    public DropZone(AppVariables appVariables){
+        this.appVariables = appVariables;
+        textField = new JTextField("Enter Youtube Link");
+        addButton = new JButton("Add To Batch");
+        textField.getDocument().addDocumentListener(new DocumentListener(){
+            public void changedUpdate(DocumentEvent documentEvent) {
+                System.out.println(documentEvent);
+            }
+            public void removeUpdate(DocumentEvent documentEvent) {
+                System.out.println(documentEvent);
+            }
+            public void insertUpdate(DocumentEvent documentEvent) {
+                System.out.println(documentEvent);
+            }
+        });
+        //textListener.addActionListener( new ActionListener() {
+        //    public void actionPerformed(ActionEvent e){
+//
+       //     }
+       // });
+        add(textField);
+        add(addButton);
+        //textListener = new DocumentListener();
     }
+
 }
 class BatchView extends JPanel{
     public BatchView(AppVariables appVariables){
