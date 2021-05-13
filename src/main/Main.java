@@ -17,7 +17,16 @@ import java.util.ArrayList;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import com.github.kiulian.downloader.*;
+import com.github.kiulian.downloader.OnYoutubeDownloadListener;
+import com.github.kiulian.downloader.YoutubeDownloader;
+import com.github.kiulian.downloader.YoutubeException;
+import com.github.kiulian.downloader.model.VideoDetails;
+import com.github.kiulian.downloader.model.YoutubeVideo;
+import com.github.kiulian.downloader.model.formats.AudioVideoFormat;
+import com.github.kiulian.downloader.model.formats.Format;
+import com.github.kiulian.downloader.parser.DefaultParser;
+import com.github.kiulian.downloader.parser.Parser;
+//import com.github.kiulian.video.*;
 public class Main{
     
     public static void main(String[] args){
@@ -60,7 +69,7 @@ public class Main{
         DropZone dropZone = new DropZone(appVariables);
         MediaPlayer mediaPlayer = new MediaPlayer(appVariables);
         Header header = new Header(appVariables, fileView);
-
+        appVariables.batchView = batchView;
         panel1.add(header);
         panel2.add(fileView);
         panel3.add(dropZone);
@@ -97,6 +106,7 @@ class Youtils{
 class BatchItem{
     File file;
     boolean isFile;
+    YoutubeVideo video;
 
 }
 class AppVariables{
@@ -104,6 +114,14 @@ class AppVariables{
     File fileChoose;
     JFileChooser fc;
     ArrayList<BatchItem> items = new ArrayList<BatchItem>();
+    BatchView batchView;
+    YoutubeDownloader downloader;
+    //public AppVariables(){
+    //    Parser parser = new DefaultParser();
+    //    downloader = new YoutubeDownloader(parser);
+       //downloader.setParserRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36");
+       // downloader.setParserRetryOnFailure(1);
+    //}
 }
 class Header extends JPanel{
     //File fileChoose;
@@ -255,6 +273,7 @@ class DropZone extends JPanel{
 
     private JTextField textField;
     private JButton addButton;
+    private String text;
     //private DocumentListener textListener;
     AppVariables appVariables;
     public DropZone(AppVariables appVariables){
@@ -263,13 +282,32 @@ class DropZone extends JPanel{
         addButton = new JButton("Add To Batch");
         textField.getDocument().addDocumentListener(new DocumentListener(){
             public void changedUpdate(DocumentEvent documentEvent) {
-                System.out.println(documentEvent);
+                text = textField.getText();
+                System.out.println(text);
             }
             public void removeUpdate(DocumentEvent documentEvent) {
-                System.out.println(documentEvent);
+                text = textField.getText();
+                System.out.println(text);
             }
             public void insertUpdate(DocumentEvent documentEvent) {
-                System.out.println(documentEvent);
+                text = textField.getText();
+                System.out.println(text);
+            }
+        });
+        addButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                BatchItem tempItem = new BatchItem();
+                YoutubeDownloader downloader = new YoutubeDownloader();
+
+                //YoutubeVideo tempVideo = appVariables.downloader.getVideo(text);
+                tempItem.isFile = false;
+                //try{
+                //    tempItem.video = downloader.getVideo(text);
+               // }
+               // catch(YoutubeException env){
+               //     System.out.println("this");
+               // }
+               // appVariables.items.add(tempItem);
             }
         });
         //textListener.addActionListener( new ActionListener() {
@@ -301,8 +339,15 @@ class BatchView extends JPanel{
         System.out.println("this should be more unique");
         int i = 0;
         for(BatchItem iter : appVariables.items){
-            System.out.println(iter.file.getName());
-            JButton item = new JButton(iter.file.getName());
+            String name = "";
+            if(iter.isFile == true){
+                name = iter.file.getName();
+                System.out.println(iter.file.getName());
+            }
+            else{
+                name = iter.video.details().title();
+            }
+            JButton item = new JButton(name);
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e){
                     //remove(item);
