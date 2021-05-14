@@ -30,13 +30,12 @@ import com.github.kiulian.downloader.parser.Parser;
 public class Main{
     
     public static void main(String[] args){
-        //JFrame frame = new JFrame();
+
         AppVariables appVariables = new AppVariables();
         appVariables.frame = new JFrame();
         appVariables.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         appVariables.frame.setSize(2000,2000);
-        //appVariables.frame.setLayout(new BorderLayout(10,10));
-        //appVariables.frame.setPreferredSize(2000,2000);
+
 		appVariables.frame.setVisible(true);
         //JPanel panels[];
         JPanel overall = new JPanel();
@@ -49,12 +48,6 @@ public class Main{
 		JPanel panel5 = new JPanel();
         JScrollPane scrollPane2 = new JScrollPane(panel2);
         JScrollPane scrollPane4 = new JScrollPane(panel4);
-        
-		//panel1.setPreferredSize(new Dimension(100,50));
-		//panel2.setPreferredSize(new Dimension(500,500));
-		//panel3.setPreferredSize(new Dimension(500,500));
-		//panel4.setPreferredSize(new Dimension(500,500));
-		//panel5.setPreferredSize(new Dimension(100,100));
 
         panel1.setBorder(BorderFactory.createLineBorder(Color.black));
         panel2.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -84,23 +77,8 @@ public class Main{
         appVariables.frame.add(overall);
         appVariables.frame.pack();
         appVariables.frame.setVisible(true);
-        /*appVariables.frame.add(panel1,BorderLayout.NORTH);
-		appVariables.frame.add(scrollPane2,BorderLayout.WEST);
-		appVariables.frame.add(panel4,BorderLayout.EAST);
-		appVariables.frame.add(panel5,BorderLayout.SOUTH);
-		appVariables.frame.add(panel3,BorderLayout.CENTER);
-        appVariables.frame.pack();
-        appVariables.frame.setVisible(true);*/
-    }
-}
-
-class Youtils{
-
-    public Youtils(AppVariables appVariables){
 
     }
-
-
 }
 
 class BatchItem{
@@ -116,17 +94,15 @@ class AppVariables{
     ArrayList<BatchItem> items = new ArrayList<BatchItem>();
     BatchView batchView;
     YoutubeDownloader downloader;
-    //public AppVariables(){
-    //    Parser parser = new DefaultParser();
-    //    downloader = new YoutubeDownloader(parser);
-       //downloader.setParserRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36");
-       // downloader.setParserRetryOnFailure(1);
-    //}
+    public AppVariables(){
+        Parser parser = new DefaultParser();
+        downloader = new YoutubeDownloader(parser);
+       downloader.setParserRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36");
+        downloader.setParserRetryOnFailure(1);
+    }
 }
 class Header extends JPanel{
-    //File fileChoose;
-    
-    //JFileChooser fc; 
+ 
     public Header(AppVariables appVariables, FileView fileView){
         JButton settings = new JButton("SETTINGS");
         JButton file = new JButton("FILE");
@@ -138,32 +114,17 @@ class Header extends JPanel{
             }
         });
         file.addActionListener(new ActionListener() {
-            //JFileChooser fc = new JFileChooser();
-            //JFileChooser.addActionListener
             public void actionPerformed(ActionEvent e) {
-                //Handle open button action.
                 appVariables.fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 int returnVal = appVariables.fc.showOpenDialog(Header.this);
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    
+                if (returnVal == JFileChooser.APPROVE_OPTION) {                    
                     appVariables.fileChoose = appVariables.fc.getSelectedFile();
                     System.out.println(appVariables.fileChoose.getName()+"This is a print");
                     String[] filesS = appVariables.fileChoose.list();
-                    //File[] files = fileChoose.
-                    //for(String iter : filesS){
-                    //    System.out.println(iter);
-                    //}
                     fileView.refresh();
-                    //This is where a real application would open the file.
-                    //log.append("Opening: " + file.getName() + "." + newline);
                 } else {
-                    //log.append("Open command cancelled by user." + newline);
-                }
-                //log.setCaretPosition(log.getDocument().getLength());
-
-                
-                
+                    
+                }                                
             }
         });
         play.addActionListener(new ActionListener() {
@@ -191,79 +152,27 @@ class FileView extends JPanel{
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         
         add(panel);
-        //appVariables.fc.addActionListener(new ActionListener() {
-        //load.addActionListener(new ActionListener() {
-        //    public void actionPerformed(ActionEvent e) {
-         //       refresh();
-                /*panel.removeAll();
-                panel.revalidate();
-                panel.repaint();
-                //System.out.println("This occured");
-                //if(appVariables.fileChoose != null && appVariables.fileChoose.length() > 0){
-                    //for(String iter : appVariables.fileChoose.list()){
-                    //    System.out.println(iter);
-                    //}
-                    for(File file : appVariables.fileChoose.listFiles()){
-                        if(file.getName().endsWith(".mp3")){
-                            //System.out.println("This got chosen");
-                            JButton song = new JButton(file.getName());
-                            song.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e){
-                                    BatchItem temp = new BatchItem();
-                                    temp.file = file;
-                                    temp.isFile = true;
-                                    appVariables.items.add(temp);
-                                    //System.out.println(file.getName());
-                                    batchView.refresh(appVariables);
-                                    SwingUtilities.updateComponentTreeUI(appVariables.frame);
-                                    //batchView.revalidate();
-                                    //batchView.repaint();
-                                    //appVariables.frame.getComponentAt(BorderLayout.EAST).revalidate();
-                                }
-                            });
-                            panel.add(song);
-                        }
-                    }
-                
-                //}
-                
-                SwingUtilities.updateComponentTreeUI(appVariables.frame);
-                 *///}
-        //});
+
 
     }
     public void refresh(){
-        panel.removeAll();
-        panel.revalidate();
-        panel.repaint();
-        //System.out.println("This occured");
-        //if(appVariables.fileChoose != null && appVariables.fileChoose.length() > 0){
-            //for(String iter : appVariables.fileChoose.list()){
-            //    System.out.println(iter);
-            //}
-            for(File file : appVariables.fileChoose.listFiles()){
-                if(file.getName().endsWith(".mp3")){
-                    //System.out.println("This got chosen");
-                    JButton song = new JButton(file.getName());
-                    song.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e){
-                            BatchItem temp = new BatchItem();
-                            temp.file = file;
-                            temp.isFile = true;
-                            appVariables.items.add(temp);
-                            //System.out.println(file.getName());
-                            batchView.refresh(appVariables);
-                            SwingUtilities.updateComponentTreeUI(appVariables.frame);
-                            //batchView.revalidate();
-                            //batchView.repaint();
-                            //appVariables.frame.getComponentAt(BorderLayout.EAST).revalidate();
-                        }
-                    });
-                    panel.add(song);
-                }
+
+        for(File file : appVariables.fileChoose.listFiles()){
+            if(file.getName().endsWith(".mp3")){
+                JButton song = new JButton(file.getName());
+                song.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e){
+                        BatchItem temp = new BatchItem();
+                        temp.file = file;
+                        temp.isFile = true;
+                        appVariables.items.add(temp);
+                        batchView.refresh(appVariables);
+                        SwingUtilities.updateComponentTreeUI(appVariables.frame);
+                    }
+                });
+                panel.add(song);
             }
-        
-        //}
+        }
         
         SwingUtilities.updateComponentTreeUI(appVariables.frame);
     }
@@ -297,27 +206,26 @@ class DropZone extends JPanel{
         addButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 BatchItem tempItem = new BatchItem();
-                YoutubeDownloader downloader = new YoutubeDownloader();
+                YoutubeDownloader downloader = appVariables.downloader;
+                YoutubeVideo tempVideo = null;
+                try{
+                    tempVideo = appVariables.downloader.getVideo(text);
+                    
+                }
+                catch(YoutubeException env){
+                    System.out.println("this didnt work");
+                    System.out.println(env);
+                }
+                if(tempVideo!=null){
+                    tempItem.isFile = false;
+                    tempItem.video = tempVideo;
+                    appVariables.items.add(tempItem);
+                }
 
-                //YoutubeVideo tempVideo = appVariables.downloader.getVideo(text);
-                tempItem.isFile = false;
-                //try{
-                //    tempItem.video = downloader.getVideo(text);
-               // }
-               // catch(YoutubeException env){
-               //     System.out.println("this");
-               // }
-               // appVariables.items.add(tempItem);
             }
         });
-        //textListener.addActionListener( new ActionListener() {
-        //    public void actionPerformed(ActionEvent e){
-//
-       //     }
-       // });
         add(textField);
         add(addButton);
-        //textListener = new DocumentListener();
     }
 
 }
@@ -348,14 +256,25 @@ class BatchView extends JPanel{
                 name = iter.video.details().title();
             }
             JButton item = new JButton(name);
-            item.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e){
-                    //remove(item);
-                    appVariables.items.remove(iter);
-                    refresh(appVariables);
-                    SwingUtilities.updateComponentTreeUI(appVariables.frame);
+
+            class itemAction implements ActionListener{
+                AppVariables appVariablesInner;
+                JButton itemInner;
+                BatchItem iterInner;
+                public itemAction(AppVariables appTemp, JButton itemTemp, BatchItem iterTemp){
+                    this.appVariablesInner = appTemp;
+                    this.itemInner = itemTemp;
+                    this.iterInner = iterTemp;
                 }
-            });
+                
+                public void actionPerformed(ActionEvent e){
+                    BatchView.this.remove(itemInner);
+                    appVariablesInner.items.remove(iterInner);
+                    refresh(appVariablesInner);
+                    SwingUtilities.updateComponentTreeUI(appVariablesInner.frame);
+                }
+            }
+            item.addActionListener(new itemAction(appVariables, item, iter));
             add(item);
             i++;
         }
